@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Swine Farm Profitability Predictor</title>
+
+<!-- ============================================================
+     EDIT ME: point this at your deployed Streamlit app's URL.
+     Must be a public https:// URL (Streamlit Community Cloud,
+     Render, Railway, etc.) — localhost only works for testing
+     on the same machine.
+     ============================================================ -->
+<script>
+  const STREAMLIT_APP_URL = "https://YOUR-APP-NAME.streamlit.app/?embed=true";
+</script>
+
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#1B2420" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Swine Farm" />
+<link rel="icon" href="icons/icon-192.png" />
+
+<style>
+  :root {
+    --soil-dark: #1B2420;
+    --sage: #6FA875;
+    --ochre: #C9973F;
+  }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--soil-dark);
+    font-family: 'Inter', -apple-system, sans-serif;
+    overscroll-behavior: none;
+  }
+  #app-frame {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    border: none;
+    background: var(--soil-dark);
+  }
+  #splash {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(111,168,117,0.14), transparent 45%),
+      radial-gradient(circle at 80% 80%, rgba(201,151,63,0.12), transparent 45%),
+      var(--soil-dark);
+    color: #EDEDE3;
+    z-index: 10;
+    transition: opacity 0.4s ease;
+  }
+  #splash.hidden { opacity: 0; pointer-events: none; }
+  .logo-pig {
+    font-size: 44px;
+    animation: bob 2.2s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .splash-title {
+    font-weight: 700; font-size: 16px; letter-spacing: 0.4px;
+    background: linear-gradient(90deg, #EDEDE3, var(--sage));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .splash-sub { font-size: 12.5px; color: #93A399; }
+  .offline-banner {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: #5c1f1f; color: #fff; text-align: center;
+    font-size: 13px; padding: 6px; z-index: 20; display: none;
+  }
+</style>
+</head>
+<body>
+
+  <div id="offline-banner" class="offline-banner">
+    ⚠️ No internet connection — the live dashboard needs a connection to load data.
+  </div>
+
+  <div id="splash">
+    <div class="logo-pig">🐖</div>
+    <div class="splash-title">Swine Farm Profitability Predictor</div>
+    <div class="splash-sub">Loading dashboard…</div>
+  </div>
+
+  <iframe id="app-frame" allow="geolocation" title="Swine Farm Profitability Predictor Dashboard"></iframe>
+
+<script>
+  const frame = document.getElementById("app-frame");
+  const splash = document.getElementById("splash");
+  const offlineBanner = document.getElementById("offline-banner");
+
+  frame.src = STREAMLIT_APP_URL;
+  frame.addEventListener("load", () => splash.classList.add("hidden"));
+  // Safety timeout in case the 'load' event doesn't fire as expected
+  setTimeout(() => splash.classList.add("hidden"), 6000);
+
+  function updateOnlineStatus() {
+    offlineBanner.style.display = navigator.onLine ? "none" : "block";
+  }
+  window.addEventListener("online", updateOnlineStatus);
+  window.addEventListener("offline", updateOnlineStatus);
+  updateOnlineStatus();
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
